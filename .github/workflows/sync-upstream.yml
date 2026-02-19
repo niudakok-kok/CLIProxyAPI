@@ -28,7 +28,11 @@ jobs:
           git remote add upstream https://github.com/router-for-me/CLIProxyAPI.git
           git fetch upstream --tags
           VERSION=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null || echo "latest")
+          COMMIT=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "commit=${COMMIT}" >> $GITHUB_OUTPUT
+          echo "build_date=${BUILD_DATE}" >> $GITHUB_OUTPUT
           echo "Upstream version: ${VERSION}"
 
       - name: Merge upstream main
@@ -55,5 +59,9 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/cliproxyapi:latest
             ghcr.io/${{ github.repository_owner }}/cliproxyapi:${{ steps.version.outputs.version }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            COMMIT=${{ steps.version.outputs.commit }}
+            BUILD_DATE=${{ steps.version.outputs.build_date }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
