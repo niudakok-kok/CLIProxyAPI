@@ -36,7 +36,6 @@ jobs:
           git remote add upstream https://github.com/router-for-me/CLIProxyAPI.git
           git fetch upstream --tags
           
-          # 如果手动指定了版本，使用指定的版本
           if [ "${{ inputs.version }}" != "" ] && [ "${{ inputs.version }}" != "latest" ]; then
             VERSION="${{ inputs.version }}"
           else
@@ -95,23 +94,22 @@ jobs:
           IMAGE: ghcr.io/${{ github.repository_owner }}/cliproxyapi:${{ needs.sync-and-build.outputs.version }}
         run: |
           if [ "${{ needs.sync-and-build.result }}" = "success" ]; then
-            TEXT="✅ *CLIProxyAPI 构建成功*
+            TEXT="✅ CLIProxyAPI Build SUCCESS
 
-**版本**: \`${VERSION}\`
-**镜像**: \`${IMAGE}\`
+Version: ${VERSION}
+Image: ${IMAGE}
 
-\`docker pull ${IMAGE}\`
+docker pull ${IMAGE}
 
-[查看构建日志](${RUN_URL})"
+Logs: ${RUN_URL}"
           else
-            TEXT="❌ *CLIProxyAPI 构建失败*
+            TEXT="❌ CLIProxyAPI Build FAILED
 
-**版本**: \`${VERSION}\`
+Version: ${VERSION}
 
-[查看错误日志](${RUN_URL})"
+Logs: ${RUN_URL}"
           fi
           
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
             -d chat_id="${CHAT_ID}" \
-            -d text="${TEXT}" \
-            -d parse_mode=Markdown
+            -d text="${TEXT}"
